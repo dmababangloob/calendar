@@ -1,0 +1,98 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f4f4f4;
+    margin: 0;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 50px);
+    grid-gap: 5px;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .calendar .day {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .calendar .day.marked {
+    background-color: #ff6347;
+    color: white;
+  }
+
+  .calendar .day.slash {
+    text-decoration: line-through;
+    background-color: #f0f0f0;
+  }
+
+  .calendar .day.disabled {
+    background-color: #eee;
+    cursor: not-allowed;
+  }
+
+  .header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+    margin: 10px;
+  }
+
+  .month-button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+  }
+
+  .month-button:hover {
+    background-color: #45a049;
+  }
+
+  select {
+    padding: 10px;
+    margin: 10px;
+    font-size: 16px;
+  }
+
+  .reset-btn {
+    padding: 10px 20px;
+    margin-top: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .reset-btn:hover {
+    background-color: #45a049;
+  }
+
+  .day-name {
+    font-weight: bold;
+    padding: 5px;
+    text-align: center;
+  }
