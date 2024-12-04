@@ -1,45 +1,67 @@
 let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth(); // 0-based index (0 = January)
+let currentMonth = new Date().getMonth();
 let selectedYear = currentYear;
 let selectedMonth = currentMonth;
 
-// Initialize the year options (2024 to 2028)
+// Load previous state from localStorage
+const savedState = JSON.parse(localStorage.getItem('calendar_state'));
+if (savedState) {
+  selectedYear = savedState.year;
+  selectedMonth = savedState.month;
+}
+
+// Initialize year options (2024 to 2070)
 const yearSelect = document.getElementById('yearSelect');
-for (let year = 2024; year <= 2028; year++) {
+for (let year = 2024; year <= 2070; year++) {
   const option = document.createElement('option');
   option.value = year;
   option.textContent = year;
   yearSelect.appendChild(option);
 }
 
-// Function to load slashed days from localStorage
+// Initialize month options
+const monthSelect = document.createElement('select');
+monthSelect.id = 'monthSelect';
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+monthNames.forEach((month, index) => {
+  const option = document.createElement('option');
+  option.value = index;
+  option.textContent = month;
+  monthSelect.appendChild(option);
+});
+document.querySelector('.navigation').appendChild(monthSelect);
+
+// Save state to localStorage
+function saveCalendarState() {
+  localStorage.setItem('calendar_state', JSON.stringify({ year: selectedYear, month: selectedMonth }));
+}
+
+// Load slashed days
 function loadSlashedDays() {
   const savedData = JSON.parse(localStorage.getItem(`calendar_${selectedYear}_${selectedMonth}`)) || {};
   return savedData;
 }
 
-// Function to save slashed days to localStorage
+// Save slashed days
 function saveSlashedDays(slashedDays) {
   localStorage.setItem(`calendar_${selectedYear}_${selectedMonth}`, JSON.stringify(slashedDays));
 }
 
-// Generate the calendar for the selected year and month
+// Generate calendar
 function generateCalendar() {
-  const slashedDays = loadSlashedDays(); // Load previously slashed days from localStorage
+  const slashedDays = loadSlashedDays();
   const firstDay = new Date(selectedYear, selectedMonth, 1);
-  const lastDay = new Date(selectedYear, selectedMonth + 1, 0); // Last day of the month
+  const lastDay = new Date(selectedYear, selectedMonth + 1, 0);
   const daysInMonth = lastDay.getDate();
-  const firstDayOfMonth = firstDay.getDay(); // Get the day of the week (0-6)
+  const firstDayOfMonth = firstDay.getDay();
 
-  // Update the month header
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   document.getElementById('monthHeader').innerText = `${monthNames[selectedMonth]} ${selectedYear}`;
+  yearSelect.value = selectedYear;
+  monthSelect.value = selectedMonth;
 
-  // Clear the calendar container
   const calendarContainer = document.getElementById('calendar');
   calendarContainer.innerHTML = '';
 
-  // Days of the week header
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   dayNames.forEach(dayName => {
     const dayHeader = document.createElement('div');
@@ -48,77 +70,90 @@ function generateCalendar() {
     calendarContainer.appendChild(dayHeader);
   });
 
-  // Generate the days for the month
   for (let i = 0; i < firstDayOfMonth; i++) {
     const emptyCell = document.createElement('div');
     calendarContainer.appendChild(emptyCell);
   }
 
-  // Add days to the grid
   for (let day = 1; day <= daysInMonth; day++) {
     const dayDate = new Date(selectedYear, selectedMonth, day);
     const dayCell = document.createElement('div');
     dayCell.classList.add('day');
-    dayCell.innerHTML = day;
+    dayCell.innerHTML = `<span>${day}</span><div contenteditable="true" class="memo"></div>`;
 
-    // If the day has been slashed, add the 'slash' class
     if (slashedDays[dayDate.toDateString()]) {
       dayCell.classList.add('slash');
     }
 
-    // Add event listener to mark days
     dayCell.addEventListener('click', () => {
-      if (!dayCell.classList.contains('disabled')) {
-        dayCell.classList.toggle('slash');
-        slashedDays[dayDate.toDateString()] = dayCell.classList.contains('slash');
-        saveSlashedDays(slashedDays);
-      }
+      dayCell.classList.toggle('slash');
+      slashedDays[dayDate.toDateString()] = dayCell.classList.contains('slash');
+      saveSlashedDays(slashedDays);
+    });
+
+    dayCell.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      dayCell.classList.toggle('important');
     });
 
     calendarContainer.appendChild(dayCell);
   }
+
+  saveCalendarState();
 }
 
-// Move to the next month
+// Month navigation
 function nextMonth() {
-  if (selectedMonth === 11) { // December
-    selectedMonth = 0; // January
-    selectedYear++;
-  } else {
-    selectedMonth++;
-  }
-  yearSelect.value = selectedYear;
+  selectedMonth = (selectedMonth + 1) % 12;
+  if (selectedMonth === 0) selectedYear++;
   generateCalendar();
 }
 
-// Move to the previous month
 function prevMonth() {
-  if (selectedMonth === 0) { // January
-    selectedMonth = 11; // December
-    selectedYear--;
-  } else {
-    selectedMonth--;
-  }
-  yearSelect.value = selectedYear;
+  selectedMonth = (selectedMonth - 1 + 12) % 12;
+  if (selectedMonth === 11) selectedYear--;
   generateCalendar();
 }
 
-// Reset the calendar to clear all slashes
+// Reset calendar
 function resetCalendar() {
-  const slashedDays = {};
-  saveSlashedDays(slashedDays);
+  localStorage.removeItem(`calendar_${selectedYear}_${selectedMonth}`);
   generateCalendar();
 }
 
-// Set up event listeners
+// Event Listeners
 document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
 document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
 document.getElementById('resetBtn').addEventListener('click', resetCalendar);
-
 yearSelect.addEventListener('change', (event) => {
   selectedYear = parseInt(event.target.value);
   generateCalendar();
 });
+monthSelect.addEventListener('change', (event) => {
+  selectedMonth = parseInt(event.target.value);
+  generateCalendar();
+});
 
-// Initialize the calendar for the current month and year
+// Initialize calendar
 generateCalendar();
+
+// Dark mode toggle
+const toggleModeButton = document.getElementById('toggleMode');
+const body = document.body;
+
+function toggleDarkMode() {
+  const isDarkMode = body.classList.toggle('dark-mode');
+  body.classList.toggle('light-mode', !isDarkMode);
+  toggleModeButton.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+  localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+}
+
+// Load mode from localStorage
+const savedMode = localStorage.getItem('darkMode');
+if (savedMode === 'enabled') {
+  body.classList.add('dark-mode');
+  body.classList.remove('light-mode');
+  toggleModeButton.textContent = 'Light Mode';
+}
+
+toggleModeButton.addEventListener('click', toggleDarkMode);

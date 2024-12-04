@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Countdown Calendar</title>
   <link rel="stylesheet" href="styles.css">
-  
 </head>
-<body>
+<body class="light-mode">
+  <header>
+    <div class="header" id="monthHeader">Select Year and Month</div>
+    <button class="toggle-mode" id="toggleMode">Dark Mode</button>
+  </header>
 
   <div>
-    <div class="header" id="monthHeader">Select Year and Month</div>
-
     <div class="navigation">
       <button class="month-button" id="prevMonthBtn">Prev Month</button>
       <select id="yearSelect"></select>
+     
       <button class="month-button" id="nextMonthBtn">Next Month</button>
     </div>
 
