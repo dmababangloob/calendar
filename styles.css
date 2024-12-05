@@ -157,7 +157,7 @@ header {
 .reset-btn {
   padding: 10px 20px;
   margin-top: 20px;
-  background-color: #4CAF50;
+  background-color: rgb(176, 86, 221);
   color: white;
   border: none;
   cursor: pointer;
@@ -176,7 +176,7 @@ body.light-mode {
 }
 
 body.light-mode .month-button {
-  background-color: #4CAF50;
+  background-color: #f12d5e;
   color: white;
 }
 

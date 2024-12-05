@@ -47,6 +47,18 @@ function saveSlashedDays(slashedDays) {
   localStorage.setItem(`calendar_${selectedYear}_${selectedMonth}`, JSON.stringify(slashedDays));
 }
 
+// Save memos to localStorage
+function saveMemo(day, memoContent) {
+  const key = `memo_${selectedYear}_${selectedMonth}_${day}`;
+  localStorage.setItem(key, memoContent);
+}
+
+// Load memo for a specific day
+function loadMemo(day) {
+  const key = `memo_${selectedYear}_${selectedMonth}_${day}`;
+  return localStorage.getItem(key) || '';
+}
+
 // Generate calendar
 function generateCalendar() {
   const slashedDays = loadSlashedDays();
@@ -79,8 +91,23 @@ function generateCalendar() {
     const dayDate = new Date(selectedYear, selectedMonth, day);
     const dayCell = document.createElement('div');
     dayCell.classList.add('day');
-    dayCell.innerHTML = `<span>${day}</span><div contenteditable="true" class="memo"></div>`;
+    dayCell.innerHTML = `<span>${day}</span>`;
 
+    const memo = document.createElement('div');
+    memo.contentEditable = 'true';
+    memo.classList.add('memo');
+
+    // Load saved memo content
+    memo.textContent = loadMemo(day);
+
+    // Add event listener to save memo content on input
+    memo.addEventListener('input', () => {
+      saveMemo(day, memo.textContent);
+    });
+
+    dayCell.appendChild(memo);
+
+    // Handle slashed days
     if (slashedDays[dayDate.toDateString()]) {
       dayCell.classList.add('slash');
     }
