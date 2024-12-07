@@ -42,9 +42,20 @@ function loadSlashedDays() {
   return savedData;
 }
 
+// Load important days
+function loadImportantDays() {
+  const savedImportantDays = JSON.parse(localStorage.getItem(`important_days_${selectedYear}_${selectedMonth}`)) || {};
+  return savedImportantDays;
+}
+
 // Save slashed days
 function saveSlashedDays(slashedDays) {
   localStorage.setItem(`calendar_${selectedYear}_${selectedMonth}`, JSON.stringify(slashedDays));
+}
+
+// Save important days
+function saveImportantDays(importantDays) {
+  localStorage.setItem(`important_days_${selectedYear}_${selectedMonth}`, JSON.stringify(importantDays));
 }
 
 // Save memos to localStorage
@@ -62,6 +73,7 @@ function loadMemo(day) {
 // Generate calendar
 function generateCalendar() {
   const slashedDays = loadSlashedDays();
+  const importantDays = loadImportantDays();
   const firstDay = new Date(selectedYear, selectedMonth, 1);
   const lastDay = new Date(selectedYear, selectedMonth + 1, 0);
   const daysInMonth = lastDay.getDate();
@@ -112,6 +124,11 @@ function generateCalendar() {
       dayCell.classList.add('slash');
     }
 
+    // Handle important days
+    if (importantDays[dayDate.toDateString()]) {
+      dayCell.classList.add('important');
+    }
+
     dayCell.addEventListener('click', () => {
       dayCell.classList.toggle('slash');
       slashedDays[dayDate.toDateString()] = dayCell.classList.contains('slash');
@@ -121,6 +138,8 @@ function generateCalendar() {
     dayCell.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       dayCell.classList.toggle('important');
+      importantDays[dayDate.toDateString()] = dayCell.classList.contains('important');
+      saveImportantDays(importantDays);
     });
 
     calendarContainer.appendChild(dayCell);
@@ -128,6 +147,7 @@ function generateCalendar() {
 
   saveCalendarState();
 }
+
 
 // Month navigation
 function nextMonth() {
