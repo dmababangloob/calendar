@@ -169,8 +169,8 @@ function resetCalendar() {
 }
 
 // Event Listeners
-document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
-document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
+document.getElementById('prevMonthBtn').addEventListener('click', nextMonth);
+document.getElementById('nextMonthBtn').addEventListener('click', prevMonth);
 document.getElementById('resetBtn').addEventListener('click', resetCalendar);
 yearSelect.addEventListener('change', (event) => {
   selectedYear = parseInt(event.target.value);
